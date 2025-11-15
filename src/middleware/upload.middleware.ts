@@ -5,7 +5,7 @@ import { Request } from 'express';
 const storage = multer.memoryStorage();
 
 // File filter to accept images and other common file types
-const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   // Accept images, PDFs, and other common file types
   const allowedMimes = [
     'image/jpeg',
