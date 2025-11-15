@@ -4,7 +4,9 @@ import { Document } from 'mongoose';
 export interface IAcademicDetails {
   branch?: string;
   semester?: number; // For students
-  subjects?: string[];
+  collegeName?: string;
+  yearOfGraduation?: number;
+  yearOfJoining?: number;
   gpa?: number; // For students
   degree?: string; // For teachers
   yearsOfExperience?: number; // For teachers
@@ -45,6 +47,7 @@ export interface IUser extends Document {
   password: string;
   phoneNumber: string;
   city?: string;
+  gender?: 'male' | 'female' | 'other';
   role: 'student' | 'teacher';
   academics?: IAcademicDetails;
   skills: ISkills;
@@ -84,6 +87,7 @@ export interface IUserUpdate {
   about?: string;
   socialMedia?: ISocialMedia;
   profilePicture?: string;
+  gender?: 'male' | 'female' | 'other';
 }
 
 // Login DTO

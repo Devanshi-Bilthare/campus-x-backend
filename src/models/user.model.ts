@@ -12,10 +12,20 @@ const AcademicDetailsSchema = new Schema<IAcademicDetails>({
     min: 1,
     max: 12
   },
-  subjects: [{
+  collegeName: {
     type: String,
     trim: true
-  }],
+  },
+  yearOfGraduation: {
+    type: Number,
+    min: 1900,
+    max: 2100
+  },
+  yearOfJoining: {
+    type: Number,
+    min: 1900,
+    max: 2100
+  },
   gpa: {
     type: Number,
     min: 0,
@@ -120,12 +130,18 @@ const UserSchema = new Schema<IUser>({
   },
   phoneNumber: {
     type: String,
+    required: [true, 'Phone number is required'],
     trim: true,
     match: [/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, 'Please provide a valid phone number']
   },
   city: {
     type: String,
     trim: true
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other'],
+    default: 'other'
   },
   role: {
     type: String,

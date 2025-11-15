@@ -72,8 +72,11 @@ export const resetPasswordValidation = Joi.object({
 // Update user validation
 export const updateUserValidation = Joi.object({
   fullName: Joi.string().min(2).max(100).optional(),
-  
-  city: Joi.string().max(100).optional(),
+  phoneNumber: Joi.string().pattern(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/).allow('', null).optional().messages({
+    'string.pattern.base': 'Please provide a valid phone number',
+  }),
+  city: Joi.string().max(100).allow('', null).optional(),
+  gender: Joi.string().valid('male', 'female', 'other').optional(),
   academics: Joi.object({
     branch: Joi.string().optional(),
     semester: Joi.number().min(1).max(12).optional(),
