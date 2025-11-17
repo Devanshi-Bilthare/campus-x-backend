@@ -45,7 +45,7 @@ export interface IUser extends Document {
   email: string;
   username: string;
   password: string;
-  phoneNumber: string;
+  phoneNumber?: string;
   city?: string;
   gender?: 'male' | 'female' | 'other';
   role: 'student' | 'teacher';

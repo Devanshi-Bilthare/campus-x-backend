@@ -11,10 +11,9 @@ export const registerValidation = Joi.object({
     'string.email': 'Please provide a valid email address',
     'any.required': 'Email is required'
   }),
-  username: Joi.string().min(3).max(30).alphanum().required().messages({
+  username: Joi.string().min(3).max(30).required().messages({
     'string.min': 'Username must be at least 3 characters',
     'string.max': 'Username cannot exceed 30 characters',
-    'string.alphanum': 'Username can only contain letters and numbers',
     'any.required': 'Username is required'
   }),
   password: Joi.string().min(6).required().messages({
@@ -78,12 +77,15 @@ export const updateUserValidation = Joi.object({
   city: Joi.string().max(100).allow('', null).optional(),
   gender: Joi.string().valid('male', 'female', 'other').optional(),
   academics: Joi.object({
-    branch: Joi.string().optional(),
-    semester: Joi.number().min(1).max(12).optional(),
+    branch: Joi.string().allow('', null).optional(),
+    semester: Joi.number().min(1).max(12).empty('').optional(),
+    collegeName: Joi.string().allow('', null).optional(),
+    yearOfGraduation: Joi.number().min(1900).max(2100).empty('').optional(),
+    yearOfJoining: Joi.number().min(1900).max(2100).empty('').optional(),
     subjects: Joi.array().items(Joi.string()).optional(),
-    gpa: Joi.number().min(0).max(10).optional(),
-    degree: Joi.string().optional(),
-    yearsOfExperience: Joi.number().min(0).optional()
+    gpa: Joi.number().min(0).max(10).empty('').optional(),
+    degree: Joi.string().allow('', null).optional(),
+    yearsOfExperience: Joi.number().min(0).empty('').optional()
   }).optional(),
   skills: Joi.object({
     academic: Joi.array().items(Joi.string()).optional(),

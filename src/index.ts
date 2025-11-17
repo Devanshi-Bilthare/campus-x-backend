@@ -8,12 +8,13 @@ dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
+const BODY_LIMIT = process.env.MAX_BODY_SIZE || '5mb';
 
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors()); // Enable CORS
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(express.json({ limit: BODY_LIMIT })); // Parse JSON bodies with larger limit
+app.use(express.urlencoded({ extended: true, limit: BODY_LIMIT })); // Parse URL-encoded bodies with larger limit
 
 // Routes
 import userRoutes from './module/user/user.route';

@@ -120,8 +120,7 @@ const UserSchema = new Schema<IUser>({
     unique: true,
     trim: true,
     minlength: [3, 'Username must be at least 3 characters'],
-    maxlength: [30, 'Username cannot exceed 30 characters'],
-    match: [/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores']
+    maxlength: [30, 'Username cannot exceed 30 characters']
   },
   password: {
     type: String,
@@ -130,7 +129,6 @@ const UserSchema = new Schema<IUser>({
   },
   phoneNumber: {
     type: String,
-    required: [true, 'Phone number is required'],
     trim: true,
     match: [/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, 'Please provide a valid phone number']
   },
