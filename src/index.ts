@@ -19,9 +19,13 @@ app.use(express.urlencoded({ extended: true, limit: BODY_LIMIT })); // Parse URL
 // Routes
 import userRoutes from './module/user/user.route';
 import uploadRoutes from './module/upload/upload.route';
+import offeringRoutes from './module/offering/offering.route';
+import bookingRoutes from './module/booking/booking.route';
 
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/offerings', offeringRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Health check endpoint
 app.get('/health', (_req: Request, res: Response) => {
