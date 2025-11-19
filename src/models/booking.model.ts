@@ -13,6 +13,11 @@ const BookingSchema = new Schema<IBooking>({
     ref: 'Offering',
     required: [true, 'Offering ID is required']
   } as any,
+  offeringOwnerId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'Offering owner ID is required']
+  } as any,
   slot: {
     type: String,
     trim: true,
@@ -40,6 +45,7 @@ const BookingSchema = new Schema<IBooking>({
 // Create indexes for better query performance
 BookingSchema.index({ userId: 1 });
 BookingSchema.index({ offeringId: 1 });
+BookingSchema.index({ offeringOwnerId: 1 });
 BookingSchema.index({ status: 1 });
 BookingSchema.index({ createdAt: -1 });
 

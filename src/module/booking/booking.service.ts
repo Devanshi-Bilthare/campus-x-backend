@@ -47,8 +47,9 @@ export class BookingService {
 
     // Create and save the booking with the selected slot
     const booking = new Booking({
-      userId,
+      userId, // User who is booking
       offeringId: bookingData.offeringId,
+      offeringOwnerId: offering.userId, // User who created the offering
       slot: bookingData.slot, // Store the selected slot from the offering
       status: 'requested'
     });

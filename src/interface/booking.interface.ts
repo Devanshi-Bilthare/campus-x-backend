@@ -7,6 +7,7 @@ export type BookingStatus = 'requested' | 'approved' | 'rejected' | 'cancelled' 
 export interface IBooking extends Document {
   userId: Types.ObjectId; // Reference to the user who is booking
   offeringId: Types.ObjectId; // Reference to the offering
+  offeringOwnerId: Types.ObjectId; // Reference to the user who created the offering
   slot: string; // Selected time slot from the offering (e.g., "7-8pm", "8-10am")
   status: BookingStatus;
   cancelledBy?: Types.ObjectId; // Reference to the user who cancelled (if cancelled)
