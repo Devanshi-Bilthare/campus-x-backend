@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { OfferingService } from './offering.service';
-import { authenticate } from '../../middleware/auth.middleware';
 
 const offeringService = new OfferingService();
 

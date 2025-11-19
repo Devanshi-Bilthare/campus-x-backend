@@ -204,6 +204,11 @@ const UserSchema = new Schema<IUser>({
     min: 0,
     default: 0
   },
+  coins: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
   passwordResetToken: {
     type: String,
     trim: true

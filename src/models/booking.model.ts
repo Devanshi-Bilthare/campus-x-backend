@@ -13,6 +13,11 @@ const BookingSchema = new Schema<IBooking>({
     ref: 'Offering',
     required: [true, 'Offering ID is required']
   } as any,
+  slot: {
+    type: String,
+    trim: true,
+    required: [true, 'Time slot is required']
+  },
   status: {
     type: String,
     enum: ['requested', 'approved', 'rejected', 'cancelled', 'completed'],

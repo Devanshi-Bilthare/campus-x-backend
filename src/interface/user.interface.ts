@@ -59,6 +59,7 @@ export interface IUser extends Document {
   isActive: boolean;
   rating?: number;
   totalRatings?: number;
+  coins: number;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
   createdAt: Date;

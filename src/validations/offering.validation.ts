@@ -22,7 +22,8 @@ export const createOfferingValidation = Joi.object({
   }),
   duration: Joi.string().trim().required().messages({
     'any.required': 'Duration is required'
-  })
+  }),
+  image: Joi.string().uri().optional()
 });
 
 // Update offering validation
@@ -31,6 +32,7 @@ export const updateOfferingValidation = Joi.object({
   description: Joi.string().min(10).max(2000).optional(),
   tags: Joi.array().items(Joi.string().trim()).optional(),
   slots: Joi.array().items(Joi.string().trim()).optional(),
-  duration: Joi.string().trim().optional()
+  duration: Joi.string().trim().optional(),
+  image: Joi.string().uri().optional()
 });
 

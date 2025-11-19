@@ -97,11 +97,12 @@ export class BookingController {
     }
   }
 
-  // Update booking (by booking owner)
+  // Update booking (by booking owner or offering owner for status updates)
   async updateBooking(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.userId;
+      const { status } = req.body;
 
       if (!userId) {
         res.status(401).json({
@@ -111,6 +112,27 @@ export class BookingController {
         return;
       }
 
+      // If status is being updated and it's approved/rejected/completed, use offering owner logic
+      if (status && ['approved', 'rejected', 'completed'].includes(status)) {
+        const booking = await bookingService.updateBookingStatus(id, userId, status);
+        
+        if (!booking) {
+          res.status(404).json({
+            success: false,
+            message: 'Booking not found or you do not have permission to update it'
+          });
+          return;
+        }
+
+        res.status(200).json({
+          success: true,
+          message: 'Booking status updated successfully',
+          data: booking
+        });
+        return;
+      }
+
+      // Otherwise, use regular update logic (for booking owner)
       const booking = await bookingService.updateBooking(id, userId, req.body);
 
       if (!booking) {
@@ -266,7 +288,7 @@ export class BookingController {
     }
   }
 
-  // Get my bookings (bookings I made)
+  // Get my bookings (bookings I made - approved status)
   async getMyBookings(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.userId;
@@ -280,7 +302,7 @@ export class BookingController {
       }
 
       const { limit, skip } = req.query;
-      const bookings = await bookingService.getBookingsByUser(
+      const bookings = await bookingService.getMyApprovedBookings(
         userId,
         limit ? parseInt(limit as string) : undefined,
         skip ? parseInt(skip as string) : undefined
@@ -296,6 +318,111 @@ export class BookingController {
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to fetch your bookings',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
+      });
+    }
+  }
+
+  // Get my pending bookings (bookings I made that are still requested)
+  async getMyPendingBookings(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      const { limit, skip } = req.query;
+      const bookings = await bookingService.getMyPendingBookings(
+        userId,
+        limit ? parseInt(limit as string) : undefined,
+        skip ? parseInt(skip as string) : undefined
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Your pending bookings fetched successfully',
+        data: bookings,
+        count: bookings.length
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to fetch your pending bookings',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
+      });
+    }
+  }
+
+  // Get my rejected bookings (bookings I made that were rejected)
+  async getMyRejectedBookings(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      const { limit, skip } = req.query;
+      const bookings = await bookingService.getMyRejectedBookings(
+        userId,
+        limit ? parseInt(limit as string) : undefined,
+        skip ? parseInt(skip as string) : undefined
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Your rejected bookings fetched successfully',
+        data: bookings,
+        count: bookings.length
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to fetch your rejected bookings',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
+      });
+    }
+  }
+
+  // Get my completed bookings (bookings I made that are completed)
+  async getMyCompletedBookings(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      const { limit, skip } = req.query;
+      const bookings = await bookingService.getMyCompletedBookings(
+        userId,
+        limit ? parseInt(limit as string) : undefined,
+        skip ? parseInt(skip as string) : undefined
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Your completed bookings fetched successfully',
+        data: bookings,
+        count: bookings.length
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to fetch your completed bookings',
         error: process.env.NODE_ENV === 'development' ? error : undefined
       });
     }
@@ -331,6 +458,216 @@ export class BookingController {
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to fetch bookings for your offerings',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
+      });
+    }
+  }
+
+  // Get booking requests (pending requests for user's offerings)
+  async getBookingRequests(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      const { limit, skip } = req.query;
+      const requests = await bookingService.getBookingRequests(
+        userId,
+        limit ? parseInt(limit as string) : undefined,
+        skip ? parseInt(skip as string) : undefined
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Booking requests fetched successfully',
+        data: requests,
+        count: requests.length
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to fetch booking requests',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
+      });
+    }
+  }
+
+  // Get booked sessions (approved/completed bookings for user's offerings)
+  async getBookedSessions(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      const { limit, skip } = req.query;
+      const sessions = await bookingService.getBookedSessions(
+        userId,
+        limit ? parseInt(limit as string) : undefined,
+        skip ? parseInt(skip as string) : undefined
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Booked sessions fetched successfully',
+        data: sessions,
+        count: sessions.length
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to fetch booked sessions',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
+      });
+    }
+  }
+
+  // Get received bookings (booked sessions received by user for their offerings)
+  async getReceivedBookings(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      const { limit, skip } = req.query;
+      const bookings = await bookingService.getReceivedBookings(
+        userId,
+        limit ? parseInt(limit as string) : undefined,
+        skip ? parseInt(skip as string) : undefined
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Received bookings fetched successfully',
+        data: bookings,
+        count: bookings.length
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to fetch received bookings',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
+      });
+    }
+  }
+
+  // Get pending bookings for user's offerings
+  async getPendingBookings(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      const { limit, skip } = req.query;
+      const bookings = await bookingService.getPendingBookings(
+        userId,
+        limit ? parseInt(limit as string) : undefined,
+        skip ? parseInt(skip as string) : undefined
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Pending bookings fetched successfully',
+        data: bookings,
+        count: bookings.length
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to fetch pending bookings',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
+      });
+    }
+  }
+
+  // Get completed bookings for user's offerings
+  async getCompletedBookings(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      const { limit, skip } = req.query;
+      const bookings = await bookingService.getCompletedBookings(
+        userId,
+        limit ? parseInt(limit as string) : undefined,
+        skip ? parseInt(skip as string) : undefined
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Completed bookings fetched successfully',
+        data: bookings,
+        count: bookings.length
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to fetch completed bookings',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
+      });
+    }
+  }
+
+  // Get rejected bookings for user's offerings (bookings I rejected)
+  async getRejectedBookings(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      const { limit, skip } = req.query;
+      const bookings = await bookingService.getRejectedBookingsForOfferings(
+        userId,
+        limit ? parseInt(limit as string) : undefined,
+        skip ? parseInt(skip as string) : undefined
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Rejected bookings fetched successfully',
+        data: bookings,
+        count: bookings.length
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to fetch rejected bookings',
         error: process.env.NODE_ENV === 'development' ? error : undefined
       });
     }

@@ -40,6 +40,10 @@ const OfferingSchema = new Schema<IOffering>({
     type: Number,
     default: 0,
     min: 0
+  },
+  image:{
+    type: String,
+    trim: true
   }
 }, {
   timestamps: true

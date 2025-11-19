@@ -5,6 +5,9 @@ import { BookingStatus } from '../interface/booking.interface';
 export const createBookingValidation = Joi.object({
   offeringId: Joi.string().required().messages({
     'any.required': 'Offering ID is required'
+  }),
+  slot: Joi.string().trim().required().messages({
+    'any.required': 'Time slot is required'
   })
 });
 
