@@ -1,5 +1,4 @@
 import Joi from 'joi';
-import { BookingStatus } from '../interface/booking.interface';
 
 // Create booking validation
 export const createBookingValidation = Joi.object({
