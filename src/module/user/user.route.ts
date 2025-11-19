@@ -26,8 +26,8 @@ router.put('/profile', authenticate, validate(updateUserValidation), userControl
 router.put('/password', authenticate, validate(updatePasswordValidation), userController.updatePassword.bind(userController));
 
 // User management routes
-router.get('/', authenticate, userController.getUsers.bind(userController));
-router.get('/:id', authenticate, userController.getUserById.bind(userController));
+router.get('/', userController.getUsers.bind(userController));
+router.get('/:id', userController.getUserById.bind(userController));
 router.put('/:id', authenticate, validate(updateUserValidation), userController.updateUser.bind(userController));
 router.delete('/:id', authenticate, userController.deleteUser.bind(userController));
 

@@ -90,6 +90,7 @@ export class BookingService {
     return await Booking.find(query)
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .populate('cancelledBy', 'fullName email username')
       .limit(filters.limit || 50)
       .skip(filters.skip || 0)
@@ -247,6 +248,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
@@ -260,6 +262,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
@@ -273,6 +276,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
@@ -286,6 +290,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
@@ -300,6 +305,7 @@ export class BookingService {
     return await Booking.find({ offeringId: { $in: offeringIds } })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .populate('cancelledBy', 'fullName email username')
       .limit(limit || 50)
       .skip(skip || 0)
@@ -318,6 +324,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
@@ -335,6 +342,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
@@ -352,6 +360,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
@@ -369,6 +378,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
@@ -386,6 +396,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
@@ -403,6 +414,7 @@ export class BookingService {
     })
       .populate('userId', 'fullName email username profilePicture')
       .populate('offeringId')
+      .populate('offeringOwnerId', 'fullName email username profilePicture')
       .limit(limit || 50)
       .skip(skip || 0)
       .sort({ createdAt: -1 });
