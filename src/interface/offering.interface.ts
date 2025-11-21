@@ -10,6 +10,7 @@ export interface IOffering extends Document {
   image?: string; // Optional image URL
   userId: Types.ObjectId; // Reference to the user who created the offering
   completedCount: number; // Number of people who completed this offering
+  bookedSlots?: Array<{ slot: string; date: Date }>; // Track booked slot+date combinations
   createdAt: Date;
   updatedAt: Date;
 }

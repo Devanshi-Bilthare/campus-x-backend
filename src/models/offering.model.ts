@@ -44,7 +44,18 @@ const OfferingSchema = new Schema<IOffering>({
   image:{
     type: String,
     trim: true
-  }
+  },
+  bookedSlots: [{
+    slot: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    date: {
+      type: Date,
+      required: true
+    }
+  }]
 }, {
   timestamps: true
 });

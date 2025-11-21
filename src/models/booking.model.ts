@@ -23,6 +23,10 @@ const BookingSchema = new Schema<IBooking>({
     trim: true,
     required: [true, 'Time slot is required']
   },
+  date: {
+    type: Date,
+    required: [true, 'Booking date is required']
+  },
   status: {
     type: String,
     enum: ['requested', 'approved', 'rejected', 'cancelled', 'completed'],
@@ -48,6 +52,8 @@ BookingSchema.index({ offeringId: 1 });
 BookingSchema.index({ offeringOwnerId: 1 });
 BookingSchema.index({ status: 1 });
 BookingSchema.index({ createdAt: -1 });
+BookingSchema.index({ offeringId: 1, slot: 1, date: 1 });
+BookingSchema.index({ date: 1 });
 
 // Validation: If status is cancelled, cancellationReason should be provided
 BookingSchema.pre('save', function(next) {

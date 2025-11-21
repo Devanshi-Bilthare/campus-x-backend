@@ -22,35 +22,57 @@ export class BookingService {
       throw new Error('Selected time slot is not available for this offering');
     }
 
-    // Check if user already has a pending/approved booking for this offering and slot
+    // Convert date string to Date object if needed
+    const bookingDate = bookingData.date instanceof Date 
+      ? bookingData.date 
+      : new Date(bookingData.date);
+
+    // Validate date is not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const bookingDateOnly = new Date(bookingDate);
+    bookingDateOnly.setHours(0, 0, 0, 0);
+    
+    if (bookingDateOnly < today) {
+      throw new Error('Cannot book for a past date');
+    }
+
+    // Check if this slot+date combination is already booked (approved) in the offering
+    const bookedSlots = offering.bookedSlots || [];
+    const isSlotDateBooked = bookedSlots.some((booked: any) => {
+      if (booked.slot !== bookingData.slot) return false;
+      const bookedDate = new Date(booked.date);
+      bookedDate.setHours(0, 0, 0, 0);
+      return bookedDate.getTime() === bookingDateOnly.getTime();
+    });
+
+    if (isSlotDateBooked) {
+      throw new Error('This time slot is already booked for this date');
+    }
+
+    // Check if user already has a pending/approved booking for this offering, slot, and date
     const existingUserBooking = await Booking.findOne({
       userId,
       offeringId: bookingData.offeringId,
       slot: bookingData.slot,
+      date: {
+        $gte: new Date(bookingDateOnly),
+        $lt: new Date(bookingDateOnly.getTime() + 24 * 60 * 60 * 1000)
+      },
       status: { $in: ['requested', 'approved'] }
     });
 
     if (existingUserBooking) {
-      throw new Error('You already have a pending or approved booking for this offering at this time slot');
+      throw new Error('You already have a pending or approved booking for this offering at this time slot and date');
     }
 
-    // Check if this slot is already booked by someone else (prevent double-booking)
-    const existingSlotBooking = await Booking.findOne({
-      offeringId: bookingData.offeringId,
-      slot: bookingData.slot,
-      status: { $in: ['requested', 'approved'] }
-    });
-
-    if (existingSlotBooking) {
-      throw new Error('This time slot is already booked by another user');
-    }
-
-    // Create and save the booking with the selected slot
+    // Create and save the booking with the selected slot and date
     const booking = new Booking({
       userId, // User who is booking
       offeringId: bookingData.offeringId,
       offeringOwnerId: offering.userId, // User who created the offering
       slot: bookingData.slot, // Store the selected slot from the offering
+      date: bookingDate, // Store the booking date
       status: 'requested'
     });
 
@@ -139,17 +161,63 @@ export class BookingService {
     }
 
     const offering = booking.offeringId as any;
+    const previousStatus = booking.status;
 
     // Verify that the user owns the offering
     if (offering.userId.toString() !== offeringOwnerId) {
       throw new Error('You do not have permission to update this booking');
     }
 
-    // If completing, increment the offering's completed count and give coins to the user who booked
+    // Prepare date for comparison (normalize to date only, no time)
+    const bookingDate = new Date(booking.date);
+    bookingDate.setHours(0, 0, 0, 0);
+
+    // If approving, add slot+date to offering's bookedSlots
+    if (status === 'approved' && previousStatus !== 'approved') {
+      const bookedSlots = offering.bookedSlots || [];
+      
+      // Check if this slot+date is already in bookedSlots
+      const alreadyBooked = bookedSlots.some((booked: any) => {
+        if (booked.slot !== booking.slot) return false;
+        const bookedDate = new Date(booked.date);
+        bookedDate.setHours(0, 0, 0, 0);
+        return bookedDate.getTime() === bookingDate.getTime();
+      });
+
+      if (!alreadyBooked) {
+        await Offering.findByIdAndUpdate(
+          offering._id,
+          { 
+            $push: { 
+              bookedSlots: { 
+                slot: booking.slot, 
+                date: bookingDate 
+              } 
+            } 
+          }
+        );
+      }
+    }
+
+    // If rejecting and it was previously approved, remove from bookedSlots
+    if (status === 'rejected' && previousStatus === 'approved') {
+      const offeringDoc = await Offering.findById(offering._id);
+      if (offeringDoc) {
+        const bookedSlots = offeringDoc.bookedSlots || [];
+        const filteredSlots = bookedSlots.filter((booked: any) => {
+          const bookedDate = new Date(booked.date);
+          bookedDate.setHours(0, 0, 0, 0);
+          return !(booked.slot === booking.slot && bookedDate.getTime() === bookingDate.getTime());
+        });
+        offeringDoc.bookedSlots = filteredSlots;
+        await offeringDoc.save();
+      }
+    }
+
     if (status === 'completed') {
       await Offering.findByIdAndUpdate(offering._id, { $inc: { completedCount: 1 } });
-      // Add 300 coins to the user who booked
-      await User.findByIdAndUpdate(booking.userId, { $inc: { coins: 300 } });
+      await User.findByIdAndUpdate(offering.userId, { $inc: { coins: 300 } });
+      await User.findByIdAndUpdate(booking.userId, { $inc: { coins: 100 } });
     }
 
     return await Booking.findByIdAndUpdate(
@@ -175,6 +243,7 @@ export class BookingService {
     }
 
     const offering = booking.offeringId as any;
+    const previousStatus = booking.status;
 
     // Check if user is either the booking owner or offering owner
     const isBookingOwner = booking.userId.toString() === userId;
@@ -184,15 +253,34 @@ export class BookingService {
       throw new Error('You do not have permission to cancel this booking');
     }
 
-    // If booking was approved before cancellation, deduct 100 coins from the user who cancels
-    if (booking.status === 'approved') {
-      // Ensure coins don't go below 0
+    // If booking was approved before cancellation, remove from bookedSlots and deduct 100 coins
+    if (previousStatus === 'approved') {
+      // Prepare date for comparison (normalize to date only, no time)
+      const bookingDate = new Date(booking.date);
+      bookingDate.setHours(0, 0, 0, 0);
+
+      // Remove from offering's bookedSlots
+      const offeringDoc = await Offering.findById(offering._id);
+      if (offeringDoc) {
+        const bookedSlots = offeringDoc.bookedSlots || [];
+        const filteredSlots = bookedSlots.filter((booked: any) => {
+          const bookedDate = new Date(booked.date);
+          bookedDate.setHours(0, 0, 0, 0);
+          return !(booked.slot === booking.slot && bookedDate.getTime() === bookingDate.getTime());
+        });
+        offeringDoc.bookedSlots = filteredSlots;
+        await offeringDoc.save();
+      }
+
+      // Deduct 100 coins from the person who cancels (if they have it)
       const user = await User.findById(userId);
-      if (user && user.coins >= 100) {
-        await User.findByIdAndUpdate(userId, { $inc: { coins: -100 } });
-      } else if (user) {
-        // If user has less than 100 coins, set to 0
-        await User.findByIdAndUpdate(userId, { $set: { coins: 0 } });
+      if (user) {
+        if (user.coins >= 100) {
+          await User.findByIdAndUpdate(userId, { $inc: { coins: -100 } });
+        } else {
+          // If user has less than 100 coins, set to 0
+          await User.findByIdAndUpdate(userId, { $set: { coins: 0 } });
+        }
       }
     }
 

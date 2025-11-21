@@ -9,6 +9,7 @@ export interface IBooking extends Document {
   offeringId: Types.ObjectId; // Reference to the offering
   offeringOwnerId: Types.ObjectId; // Reference to the user who created the offering
   slot: string; // Selected time slot from the offering (e.g., "7-8pm", "8-10am")
+  date: Date; // Date for which the booking is made
   status: BookingStatus;
   cancelledBy?: Types.ObjectId; // Reference to the user who cancelled (if cancelled)
   cancellationReason?: string; // Reason for cancellation
@@ -20,6 +21,7 @@ export interface IBooking extends Document {
 export interface IBookingCreation {
   offeringId: string;
   slot: string; // Selected time slot from the offering
+  date: string | Date; // Date for which the booking is made (ISO string or Date)
 }
 
 // Booking Update DTO

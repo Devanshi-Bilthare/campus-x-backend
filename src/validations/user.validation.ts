@@ -24,7 +24,10 @@ export const registerValidation = Joi.object({
     'string.pattern.base': 'Please provide a valid phone number',
   }),
   city: Joi.string().max(100).optional(),
-  role: Joi.string().valid('student', 'teacher').default('student').optional()
+  role: Joi.string().valid('student', 'teacher').required().messages({
+    'any.only': 'Role must be either "student" or "teacher"',
+    'any.required': 'Role is required. Please choose either "student" or "teacher"'
+  })
 });
 
 // Login validation

@@ -7,6 +7,10 @@ export const createBookingValidation = Joi.object({
   }),
   slot: Joi.string().trim().required().messages({
     'any.required': 'Time slot is required'
+  }),
+  date: Joi.date().required().messages({
+    'any.required': 'Booking date is required',
+    'date.base': 'Please provide a valid date'
   })
 });
 

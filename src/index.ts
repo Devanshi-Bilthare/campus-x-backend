@@ -58,11 +58,13 @@ import userRoutes from './module/user/user.route';
 import uploadRoutes from './module/upload/upload.route';
 import offeringRoutes from './module/offering/offering.route';
 import bookingRoutes from './module/booking/booking.route';
+import reviewRoutes from './module/review/review.route';
 
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/offerings', offeringRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Health check endpoint
 app.get('/health', (_req: Request, res: Response) => {

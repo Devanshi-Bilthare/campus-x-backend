@@ -74,7 +74,7 @@ export interface IUserRegistration {
   password: string;
   phoneNumber?: string;
   city?: string;
-  role?: 'student' | 'teacher';
+  role: 'student' | 'teacher';
 }
 
 // User Update DTO
