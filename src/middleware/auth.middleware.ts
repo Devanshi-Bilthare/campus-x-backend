@@ -60,13 +60,19 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 };
 
 // Optional: Role-based authorization middleware
-export const authorize = (...roles: ('student' | 'teacher')[]) => {
+export const authorize = (...roles: ('student' | 'teacher' | 'admin')[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({
         success: false,
         message: 'Authentication required'
       });
+      return;
+    }
+
+    // Admin has access to all routes
+    if (req.user.role === 'admin') {
+      next();
       return;
     }
 
@@ -80,5 +86,26 @@ export const authorize = (...roles: ('student' | 'teacher')[]) => {
 
     next();
   };
+};
+
+// Admin-only middleware - allows only admin users
+export const adminOnly = (req: Request, res: Response, next: NextFunction): void => {
+  if (!req.user) {
+    res.status(401).json({
+      success: false,
+      message: 'Authentication required'
+    });
+    return;
+  }
+
+  if (req.user.role !== 'admin') {
+    res.status(403).json({
+      success: false,
+      message: 'Admin access required'
+    });
+    return;
+  }
+
+  next();
 };
 

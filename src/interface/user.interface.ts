@@ -48,7 +48,7 @@ export interface IUser extends Document {
   phoneNumber?: string;
   city?: string;
   gender?: 'male' | 'female' | 'other';
-  role: 'student' | 'teacher';
+  role: 'student' | 'teacher' | 'admin';
   academics?: IAcademicDetails;
   skills: ISkills;
   certificates?: ICertificate[];
@@ -119,6 +119,6 @@ export interface IResetPassword {
 export interface IJWTPayload {
   userId: string;
   email: string;
-  role: 'student' | 'teacher';
+  role: 'student' | 'teacher' | 'admin';
 }
 
