@@ -1,6 +1,7 @@
 import { Review } from '../../models/review.model';
 import { User } from '../../models/user.model';
 import { IReview, IReviewCreation, IReviewUpdate } from '../../interface/review.interface';
+import { IUser } from '../../interface/user.interface';
 
 export class ReviewService {
   // Create a new review
@@ -17,7 +18,7 @@ export class ReviewService {
     }
 
     // Check if user is trying to review themselves
-    if (profile._id.toString() === userId) {
+    if ((profile._id as any).toString() === userId) {
       throw new Error('You cannot write a review for yourself');
     }
 
