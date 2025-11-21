@@ -1,7 +1,6 @@
 import { Review } from '../../models/review.model';
 import { User } from '../../models/user.model';
 import { IReview, IReviewCreation, IReviewUpdate } from '../../interface/review.interface';
-import { IUser } from '../../interface/user.interface';
 
 export class ReviewService {
   // Create a new review
